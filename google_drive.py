@@ -184,6 +184,41 @@ class GoogleDriveAPI(Browser):
                                  params=params,
                                  headers=self.headers)
 
+    def create_folder(self, folder_name="PyDrive"):
+        if not self.folder_exists(folder_name):
+            metadata = {
+                'name': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder'
+            }
+
+            files = {
+                "data": ("metadata", json.dumps(metadata), "application/json")
+            }
+            self.headers["Authorization"] = f"Bearer {self.token}"
+            return self.send_request("POST",
+                                     f"{BASE_URL}/upload/drive/v3/files",
+                                     files=files,
+                                     headers=self.headers).json()
+
+        return self.folder_exists(folder_name)
+
+    def folder_exists(self, root_folder="PyDrive"):
+        folder_name = root_folder
+        for folder in self.list_folders().json().get("files"):
+            if folder.get("name") == folder_name:
+                return json.dumps(folder)
+        return False
+
+    def list_folders(self):
+        params = {
+            "mimeType": 'application/vnd.google-apps.folder'
+        }
+        self.headers["Authorization"] = f"Bearer {self.token}"
+        return self.send_request("GET",
+                                 f"{BASE_URL}/drive/v3/files",
+                                 params=params,
+                                 headers=self.headers)
+
     def upload(self, file_name, file_path):
         metadata = {
             "name": file_name,

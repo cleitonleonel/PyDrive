@@ -4,6 +4,15 @@ from google_drive import GoogleDriveAPI
 if __name__ == "__main__":
     gda = GoogleDriveAPI()
 
+    # folders = gda.list_folders().json()
+    # print(folders)
+
+    # exists = gda.verify_folder()
+    # print(exists)
+
+    create = gda.create_folder()
+    print(create)
+
     print(gda.token, gda.token_expiry)
     gda.folder_id = "1CvGUAtXgNtc205t1i2d__hmr7FW4OXK2"
 
