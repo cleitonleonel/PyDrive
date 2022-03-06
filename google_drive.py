@@ -43,6 +43,7 @@ class GoogleDriveAPI(Browser):
         self.device_code = None
         self.token = None
         self.refresh_token = None
+        self.folder_id = None
         self.file_id = None
         self.token_expiry = None
         self.authenticate()
@@ -173,9 +174,9 @@ class GoogleDriveAPI(Browser):
             else:
                 return 0
 
-    def list_files(self, folder_id):
+    def list_files(self):
         params = {
-            "parents": [folder_id]
+            "parents": [self.folder_id]
         }
         self.headers["Authorization"] = f"Bearer {self.token}"
         return self.send_request("GET",
@@ -183,10 +184,10 @@ class GoogleDriveAPI(Browser):
                                  params=params,
                                  headers=self.headers)
 
-    def upload(self, file_name, folder_id, file_path):
+    def upload(self, file_name, file_path):
         metadata = {
             "name": file_name,
-            "parents": [folder_id]
+            "parents": [self.folder_id]
         }
 
         files = {
@@ -200,11 +201,11 @@ class GoogleDriveAPI(Browser):
                                  files=files,
                                  headers=self.headers)
 
-    def update(self, file_name, folder_id, file_path):
+    def update(self, file_name, file_path):
         metadata = {
             "name": file_name,
             "id": self.file_id,
-            "parents": [folder_id]
+            "parents": [self.folder_id]
         }
 
         files = {
@@ -218,9 +219,9 @@ class GoogleDriveAPI(Browser):
                                  files=files,
                                  headers=self.headers)
 
-    def delete(self, folder_id):
+    def delete(self):
         data = {
-            "parents": [folder_id]
+            "parents": [self.folder_id]
         }
         self.headers["Authorization"] = f"Bearer {self.token}"
         return self.send_request("DELETE",
@@ -228,9 +229,9 @@ class GoogleDriveAPI(Browser):
                                  data=data,
                                  headers=self.headers)
 
-    def change_file_name(self, file_name, folder_id):
+    def change_file_name(self, file_name):
         metadata = {
-            "parents": [folder_id]
+            "parents": [self.folder_id]
         }
 
         files = {
