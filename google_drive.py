@@ -52,7 +52,7 @@ class GoogleDriveAPI(Browser):
         if self.check_secrets():
             self.load_secrets()
 
-        if not os.path.exists(os.path.join(BASE_DIR, "token.json")):
+        if not os.path.exists(os.path.join(BASE_DIR, "credentials.json")):
             verify_device = self.verify_device_code().json()
             if verify_device.get("error"):
                 print(f"CREDENCIAIS INVÁLIDAS OU NÃO FORAM ECONTRADAS: {verify_device['error']}")
@@ -74,12 +74,12 @@ class GoogleDriveAPI(Browser):
                     self.token_expiry = delta + datetime.now()
                 else:
                     self.token_expiry = None
-                with open("token.json", "w") as json_file:
+                with open("credentials.json", "w") as json_file:
                     data_token["token_expiry"] = self.token_expiry.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
                     json_file.write(json.dumps(data_token, indent=4))
         elif self.check_token_expired():
             self.refresh()
-            # os.remove(os.path.join(BASE_DIR, "token.json"))
+            # os.remove(os.path.join(BASE_DIR, "credentials.json"))
         self.expires_in()
         return True
 
@@ -137,7 +137,7 @@ class GoogleDriveAPI(Browser):
         else:
             self.token_expiry = None
 
-        with open("token.json", "r+") as json_file:
+        with open("credentials.json", "r+") as json_file:
             json_data = json.load(json_file)
             json_data["token_expiry"] = self.token_expiry.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             json_data["access_token"] = self.token
@@ -148,8 +148,8 @@ class GoogleDriveAPI(Browser):
         return False
 
     def check_token_expired(self):
-        if os.path.exists(os.path.join(BASE_DIR, "token.json")):
-            with open("token.json", "r") as json_file:
+        if os.path.exists(os.path.join(BASE_DIR, "credentials.json")):
+            with open("credentials.json", "r") as json_file:
                 json_data = json.load(json_file)
                 self.token = json_data['access_token']
                 self.refresh_token = json_data['refresh_token']
@@ -185,7 +185,7 @@ class GoogleDriveAPI(Browser):
                                  headers=self.headers)
 
     def create_folder(self, folder_name="PyDrive"):
-        if not self.folder_exists(folder_name):
+        if not self.verify_folder(folder_name):
             metadata = {
                 'name': folder_name,
                 'mimeType': 'application/vnd.google-apps.folder'
@@ -200,13 +200,13 @@ class GoogleDriveAPI(Browser):
                                      files=files,
                                      headers=self.headers).json()
 
-        return self.folder_exists(folder_name)
+        return self.verify_folder(folder_name)
 
-    def folder_exists(self, root_folder="PyDrive"):
+    def verify_folder(self, root_folder="PyDrive"):
         folder_name = root_folder
         for folder in self.list_folders().json().get("files"):
             if folder.get("name") == folder_name:
-                return json.dumps(folder)
+                return json.loads(json.dumps(folder))
         return False
 
     def list_folders(self):
@@ -219,7 +219,25 @@ class GoogleDriveAPI(Browser):
                                  params=params,
                                  headers=self.headers)
 
+    def overwrite(self, filename):
+        file_list = self.list_files().json()
+        if not file_list["files"] == []:
+            try:
+                for file in file_list["files"]:
+                    if file['name'] == filename:
+                        return file
+            except ValueError:
+                return False
+        else:
+            return False
+
     def upload(self, file_name, file_path):
+        existance_file = self.overwrite(file_name)
+
+        if existance_file:
+            self.file_id = existance_file.get("id")
+            self.delete()
+
         metadata = {
             "name": file_name,
             "parents": [self.folder_id]
