@@ -1,4 +1,4 @@
-from google_drive import GoogleDriveAPI
+from google.drive import GoogleDriveAPI
 
 if __name__ == "__main__":
     gda = GoogleDriveAPI()
