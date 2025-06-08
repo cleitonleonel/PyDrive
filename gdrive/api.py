@@ -16,7 +16,7 @@ DOWMLOAD_URL = "https://drive.google.com"
 BASE_DIR = os.getcwd()
 
 
-class Browser(object):
+class Browser:
 
     def __init__(self):
         self.response = None
@@ -89,6 +89,7 @@ class GoogleDriveAPI(Browser):
     def check_secrets(self):
         if not os.path.exists(self.file_secrets):
             return False
+
         return True
 
     def load_secrets(self):
