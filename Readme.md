@@ -5,8 +5,8 @@
 ```shell
 git clone https://github.com/cleitonleonel/PyDrive.git
 cd PyDrive
-pip3 install -r requirements.txt
-python3 backup.py
+poetry install
+poetry run python backup.py
 ```
 
 # Este projeto ajudou você?

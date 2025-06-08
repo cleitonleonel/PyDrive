@@ -102,10 +102,12 @@ class GoogleDriveAPI(Browser):
             "client_id": self.client_id,
             "scope": f"{BASE_URL}/auth/drive.file"
         }
-        return self.send_request("POST",
-                                 f"{OAUTH2_URL}/device/code",
-                                 data=data,
-                                 headers=self.headers)
+        return self.send_request(
+            "POST",
+            f"{OAUTH2_URL}/device/code",
+            data=data,
+            headers=self.headers
+        )
 
     def get_token(self):
         data = {
@@ -116,10 +118,12 @@ class GoogleDriveAPI(Browser):
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         }
 
-        return self.send_request("POST",
-                                 f"{BASE_URL}/oauth2/v4/token",
-                                 data=data,
-                                 headers=self.headers)
+        return self.send_request(
+            "POST",
+            f"{BASE_URL}/oauth2/v4/token",
+            data=data,
+            headers=self.headers
+        )
 
     def refresh(self):
         data = {
@@ -128,10 +132,12 @@ class GoogleDriveAPI(Browser):
             'client_secret': self.client_secret,
             'refresh_token': self.refresh_token,
         }
-        response = self.send_request("POST",
-                                     f"{BASE_URL}/oauth2/v4/token",
-                                     data=data,
-                                     headers=self.headers).json()
+        response = self.send_request(
+            "POST",
+            f"{BASE_URL}/oauth2/v4/token",
+            data=data,
+            headers=self.headers
+        ).json()
 
         self.token = response['access_token']
         if 'expires_in' in response:
@@ -184,10 +190,12 @@ class GoogleDriveAPI(Browser):
             "trashed": False
         }
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("GET",
-                                 f"{BASE_URL}/drive/v3/files",
-                                 params=params,
-                                 headers=self.headers)
+        return self.send_request(
+            "GET",
+            f"{BASE_URL}/drive/v3/files",
+            params=params,
+            headers=self.headers
+        )
 
     def create_folder(self, folder_name="PyDrive", parent_id=None):
         if not self.verify_folder(folder_name):
@@ -202,10 +210,12 @@ class GoogleDriveAPI(Browser):
                 "data": ("metadata", json.dumps(metadata), "application/json")
             }
             self.headers["Authorization"] = f"Bearer {self.token}"
-            return self.send_request("POST",
-                                     f"{BASE_URL}/upload/drive/v3/files",
-                                     files=files,
-                                     headers=self.headers).json()
+            return self.send_request(
+                "POST",
+                f"{BASE_URL}/upload/drive/v3/files",
+                files=files,
+                headers=self.headers
+            ).json()
 
         return self.verify_folder(folder_name)
 
@@ -225,10 +235,12 @@ class GoogleDriveAPI(Browser):
         if parent_id:
             params["parents"] = parent_id
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("GET",
-                                 f"{BASE_URL}/drive/v3/files",
-                                 params=params,
-                                 headers=self.headers)
+        return self.send_request(
+            "GET",
+            f"{BASE_URL}/drive/v3/files",
+            params=params,
+            headers=self.headers
+        )
 
     def overwrite(self, filename):
         file_list = self.list_files().json()
@@ -261,10 +273,12 @@ class GoogleDriveAPI(Browser):
         }
 
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("POST",
-                                 f"{BASE_URL}/upload/drive/v3/files?uploadType=multipart",
-                                 files=files,
-                                 headers=self.headers)
+        return self.send_request(
+            "POST",
+            f"{BASE_URL}/upload/drive/v3/files?uploadType=multipart",
+            files=files,
+            headers=self.headers
+        )
 
     def update(self, file_name, file_path):
         metadata = {
@@ -279,20 +293,24 @@ class GoogleDriveAPI(Browser):
         }
 
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("PATCH",
-                                 f"{BASE_URL}/upload/drive/v3/files/{self.file_id}",
-                                 files=files,
-                                 headers=self.headers)
+        return self.send_request(
+            "PATCH",
+            f"{BASE_URL}/upload/drive/v3/files/{self.file_id}",
+            files=files,
+            headers=self.headers
+        )
 
     def delete(self):
         data = {
             "parents": [self.folder_id]
         }
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("DELETE",
-                                 f"{BASE_URL}/drive/v3/files/{self.file_id}",
-                                 data=data,
-                                 headers=self.headers)
+        return self.send_request(
+            "DELETE",
+            f"{BASE_URL}/drive/v3/files/{self.file_id}",
+            data=data,
+            headers=self.headers
+        )
 
     def change_file_name(self, file_name):
         metadata = {
@@ -305,10 +323,12 @@ class GoogleDriveAPI(Browser):
         }
 
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("PATCH",
-                                 f"{BASE_URL}/drive/v3/files/{self.file_id}",
-                                 json=files,
-                                 headers=self.headers)
+        return self.send_request(
+            "PATCH",
+            f"{BASE_URL}/drive/v3/files/{self.file_id}",
+            json=files,
+            headers=self.headers
+        )
 
     def add_permissions(self, file_id):
         permissions = {
@@ -318,10 +338,12 @@ class GoogleDriveAPI(Browser):
         }
 
         self.headers["Authorization"] = f"Bearer {self.token}"
-        return self.send_request("POST",
-                                 f"{BASE_URL}/drive/v3/files/{file_id}/permissions",
-                                 json=permissions,
-                                 headers=self.headers)
+        return self.send_request(
+            "POST",
+            f"{BASE_URL}/drive/v3/files/{file_id}/permissions",
+            json=permissions,
+            headers=self.headers
+        )
 
     def dowload(self, file_id):
         params = {

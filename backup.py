@@ -1,5 +1,6 @@
 from gdrive.api import GoogleDriveAPI
 
+# This script demonstrates how to use the GoogleDriveAPI class to interact with Google Drive.
 if __name__ == "__main__":
     gda = GoogleDriveAPI()
 
@@ -13,8 +14,10 @@ if __name__ == "__main__":
 
     gda.folder_id = folder_id
 
-    upload = gda.upload(file_name="login_page.jpeg",
-                        file_path="login_page.jpeg").json()
+    upload = gda.upload(
+        file_name="login_page.jpeg",
+        file_path="login_page.jpeg"
+    ).json()
     print(upload)
 
     # list_files = gda.list_files().json()
